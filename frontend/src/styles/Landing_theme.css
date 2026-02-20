@@ -43,7 +43,7 @@
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
+  gap: 1.25rem;
   font-size: 1.375rem;
   font-weight: 800;
   color: var(--text-primary);
@@ -123,8 +123,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
-  width: 100%;
-  max-width: 1400px;
+  width: 100vw;
   margin: 0 auto;
   padding: 120px 2.5rem 3rem;
   align-items: center;
@@ -278,7 +277,11 @@
   right: -100px;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.2) 0%,
+    transparent 70%
+  );
 }
 
 .glow-bottom {
@@ -286,21 +289,32 @@
   left: -100px;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0.15) 0%,
+    transparent 70%
+  );
 }
 
 /* Footer */
 .landing-footer {
-  height: 60px;
-  background: var(--surface-secondary);
+  height: auto;
+  min-height: 80px;
+  margin-top: auto;
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
   font-size: 0.875rem;
-  padding: 0 2.5rem;
+  padding: 1.5rem 2.5rem;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .landing-footer p {
@@ -313,20 +327,37 @@
 @media (max-width: 1024px) {
   .landing-container {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 3rem;
     padding: 100px 2rem 2rem;
+    text-align: center;
+  }
+
+  .hero-left {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-content {
+    align-items: center;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto;
+  }
+
+  .features {
+    align-items: center;
   }
 
   .hero-title {
-    font-size: 2.75rem;
+    font-size: 3rem;
   }
 
   .hero-right {
     height: 400px;
-  }
-
-  .hero-left {
-    min-height: auto;
+    width: 100%;
+    margin: 0 auto;
+    max-width: 800px;
   }
 }
 
@@ -357,12 +388,11 @@
 
   .landing-container {
     padding: 90px 1.5rem 2rem;
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 3rem;
   }
 
   .hero-title {
-    font-size: 2rem;
+    font-size: 2.25rem;
   }
 
   .hero-subtitle {
@@ -374,8 +404,10 @@
   }
 
   .landing-footer {
-    padding: 0 1.5rem;
+    padding: 1.5rem;
     font-size: 0.75rem;
+    height: auto;
+    text-align: center;
   }
 }
 
@@ -384,22 +416,16 @@
     padding: 0 1rem;
   }
 
-  .nav-brand {
-    font-size: 1rem;
+  .nav-brand span.brand-text {
+    display: none;
   }
 
-  .brand-icon {
-    font-size: 1.125rem;
+  .nav-brand .brand-icon {
+    font-size: 1.5rem;
   }
 
-  .theme-toggle {
-    width: 32px;
-    height: 32px;
-  }
-
-  .nav-dashboard {
-    font-size: 0.65rem;
-    padding: 0.5rem 0.75rem;
+  .nav-right {
+    gap: 0.5rem;
   }
 
   .landing-container {
@@ -407,7 +433,7 @@
   }
 
   .hero-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .hero-subtitle {
@@ -425,20 +451,16 @@
   }
 
   .hero-right {
-    height: 250px;
+    height: 220px;
   }
 
   .glow-top {
-    width: 250px;
-    height: 250px;
-    top: -100px;
-    right: -50px;
+    width: 200px;
+    height: 200px;
   }
 
   .glow-bottom {
-    width: 200px;
-    height: 200px;
-    bottom: -50px;
-    left: -50px;
+    width: 150px;
+    height: 150px;
   }
 }

@@ -75,15 +75,15 @@ function ChatPanel({ analysisData, isOpen, onClose }) {
     <div className="chat-panel">
       <div className="chat-header">
         <div className="chat-title">
-          <MessageCircle size={20} />
+          💬
           <span>AI Assistant</span>
         </div>
         <div className="chat-actions">
           <button onClick={clearChat} className="icon-btn" title="Clear chat">
-            <Trash2 size={18} />
+            🗑️
           </button>
           <button onClick={onClose} className="icon-btn" title="Close chat">
-            <X size={18} />
+            ❌
           </button>
         </div>
       </div>
@@ -91,7 +91,7 @@ function ChatPanel({ analysisData, isOpen, onClose }) {
       <div className="chat-messages">
         {messages.length === 0 ? (
           <div className="chat-welcome">
-            <MessageCircle size={48} />
+            💬
             <h3>Ask me anything about this analysis</h3>
             <p>I can help you understand the data, metrics, and recommendations.</p>
             <div className="suggested-questions">
@@ -143,7 +143,7 @@ function ChatPanel({ analysisData, isOpen, onClose }) {
           disabled={!input.trim() || loading}
           className="send-btn"
         >
-          <Send size={20} />
+          📤
         </button>
       </div>
     </div>
