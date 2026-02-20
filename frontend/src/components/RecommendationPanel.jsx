@@ -1,5 +1,12 @@
-import { Lightbulb, TrendingDown, Leaf, Sparkles, Target, Zap } from 'lucide-react';
-import './RecommendationPanel.css';
+import {
+  Lightbulb,
+  TrendingDown,
+  Leaf,
+  Sparkles,
+  Target,
+  Zap,
+} from "lucide-react";
+import "./RecommendationPanel.css";
 
 function RecommendationPanel({ recommendations }) {
   if (!recommendations || recommendations.length === 0) {
@@ -14,15 +21,17 @@ function RecommendationPanel({ recommendations }) {
         </div>
         <div className="header-content">
           <h2>AI-Powered Sustainability Insights</h2>
-          <p className="header-subtitle">Smart recommendations for campus optimization</p>
+          <p className="header-subtitle">
+            Smart recommendations for campus optimization
+          </p>
         </div>
       </div>
-      
+
       <div className="recommendations-list">
         {recommendations.map((rec, idx) => (
-          <RecommendationCard 
-            key={idx} 
-            recommendation={rec} 
+          <RecommendationCard
+            key={idx}
+            recommendation={rec}
             index={idx}
             isPriority={idx < 3}
           />
@@ -44,20 +53,20 @@ function RecommendationCard({ recommendation, index, isPriority }) {
   };
 
   const getPriorityLabel = () => {
-    if (index === 0) return { label: 'Critical', color: 'critical' };
-    if (index < 3) return { label: 'High Priority', color: 'high' };
-    if (index < 6) return { label: 'Medium', color: 'medium' };
-    return { label: 'Low', color: 'low' };
+    if (index === 0) return { label: "Critical", color: "critical" };
+    if (index < 3) return { label: "High Priority", color: "high" };
+    if (index < 6) return { label: "Medium", color: "medium" };
+    return { label: "Low", color: "low" };
   };
 
   const priority = getPriorityLabel();
 
+  const cleanText = recommendation.replace(/^\d+\.\s*/, "").replace(/^- /, "");
+
   return (
     <div className={`recommendation-card ${priority.color}`}>
       <div className="card-badge">{index + 1}</div>
-      <div className="rec-icon">
-        {getIcon()}
-      </div>
+      <div className="rec-icon">{getIcon()}</div>
       <div className="rec-content">
         <div className="rec-header-row">
           <span className={`priority-badge ${priority.color}`}>
@@ -70,7 +79,7 @@ function RecommendationCard({ recommendation, index, isPriority }) {
             </span>
           )}
         </div>
-        <p className="rec-text">{recommendation}</p>
+        <p className="rec-text">{cleanText}</p>
       </div>
     </div>
   );
