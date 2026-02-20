@@ -173,6 +173,10 @@ class CampusAgentGraph:
         """Build initial state for a room agent."""
         room_config = self.room_agents[room_id].room_config
         
+        occupancy = observations.get('occupancy', 0)
+        capacity = room_config.get('capacity', 30)
+        print(f"[CAMPUS_GRAPH] Room {room_id}: occupancy={occupancy}, capacity={capacity}, ratio={occupancy/capacity if capacity > 0 else 0:.2%}")
+        
         return RoomState(
             room_id=room_id,
             room_type=room_config.get('type', 'classroom'),
@@ -180,7 +184,7 @@ class CampusAgentGraph:
             floor=room_config.get('floor', 1),
             capacity=room_config.get('capacity', 30),
             
-            current_occupancy=observations.get('occupancy', 0),
+            current_occupancy=occupancy,
             occupancy_level=observations.get('occupancy_level', 'low'),
             temperature_comfort=observations.get('temperature_comfort', 'comfortable'),
             equipment_running=observations.get('equipment_running', []),

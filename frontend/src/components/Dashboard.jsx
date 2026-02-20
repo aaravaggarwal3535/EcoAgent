@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   analysisAPI,
   isBackendAvailable,
   checkBackendHealth,
 } from "../services/api";
+import { useAnalysis } from "../contexts/AnalysisContext";
 import {
   Activity,
   Zap,
@@ -15,6 +17,7 @@ import {
   WifiOff,
   Clock,
   MessageCircle,
+  Grid3x3,
 } from "lucide-react";
 import BuildingCard from "./BuildingCard";
 import RecommendationPanel from "./RecommendationPanel";
@@ -23,6 +26,8 @@ import RoomConfigPanel from "./RoomConfigPanel";
 import "./Dashboard.css";
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const { updateAnalysis } = useAnalysis();
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -128,6 +133,7 @@ function Dashboard() {
       console.log(`✅ Analysis completed in ${duration}s`);
 
       setAnalysis(response.data);
+      updateAnalysis(response.data, params);
       setError(null);
     } catch (err) {
       setError("Failed to load campus analysis");
@@ -406,13 +412,6 @@ function Dashboard() {
           color="energy"
         />
         <MetricCard
-          icon={<Droplets />}
-          title="Water Usage"
-          value={`${summary.total_water_lph?.toFixed(1) || 0} L/h`}
-          subtitle={`${summary.total_rooms || 0} rooms monitored`}
-          color="water"
-        />
-        <MetricCard
           icon={<Users />}
           title="Occupancy"
           value={`${summary.occupancy_rate?.toFixed(1) || 0}%`}
@@ -475,6 +474,17 @@ function Dashboard() {
         </button>
       )}
 
+      {/* Room Analysis Button */}
+      {analysis && (
+        <button
+          onClick={() => navigate('/rooms')}
+          className="room-analysis-fab"
+          title="View room-by-room analysis"
+        >
+          <Grid3x3 size={24} />
+        </button>
+      )}
+
       {/* Chat Panel */}
       {analysis && (
         <ChatPanel
@@ -483,6 +493,8 @@ function Dashboard() {
           onClose={() => setChatOpen(false)}
         />
       )}
+
+
     </div>
   );
 }

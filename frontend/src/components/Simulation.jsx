@@ -261,13 +261,6 @@ function Simulation() {
                   </span>
                 </div>
                 <div className="savings-card">
-                  <span className="savings-label">Water Savings</span>
-                  <span className="savings-value success">
-                    {result.comparison?.water_savings_lph} L/h
-                    ({result.comparison?.water_savings_pct}%)
-                  </span>
-                </div>
-                <div className="savings-card">
                   <span className="savings-label">Cost Savings</span>
                   <span className="savings-value success">
                     ${result.comparison?.cost_savings_hourly}/hour

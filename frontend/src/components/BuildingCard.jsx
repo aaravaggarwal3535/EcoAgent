@@ -70,12 +70,20 @@ function BuildingCard({ building }) {
           <h4>AI Recommendations</h4>
         </div>
         <ul>
-          {(building.recommendations || building.building_recommendations || []).slice(0, 2).map((rec, idx) => (
-            <li key={idx}>
-              <span className="rec-bullet">→</span>
-              {rec}
-            </li>
-          ))}
+          {(building.recommendations || building.building_recommendations || [])
+            .filter(rec => {
+              const text = rec.toLowerCase();
+              return !text.includes("no immediate") &&
+                     !text.includes("operating efficiently") &&
+                     rec.trim().length > 10;
+            })
+            .slice(0, 2)
+            .map((rec, idx) => (
+              <li key={idx}>
+                <span className="rec-bullet">→</span>
+                {rec}
+              </li>
+            ))}
         </ul>
       </div>
 

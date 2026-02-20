@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, TrendingDown, Users, Building2, Droplets, DollarSign, RefreshCw, Sparkles, MessageCircle } from 'lucide-react';
+import { Zap, TrendingDown, Users, Building2, DollarSign, RefreshCw, Sparkles, MessageCircle } from 'lucide-react';
 import ChatPanel from './ChatPanel';
 import './QuickAnalysis.css';
 
@@ -114,29 +114,27 @@ function QuickAnalysis() {
             <p className="metric-detail">{metrics.avg_occupancy_rate}% average rate</p>
           </div>
         </div>
-
-        <div className="metric-card water">
-          <div className="metric-icon">
-            <Droplets size={28} />
-          </div>
-          <div className="metric-content">
-            <h3>Water Usage</h3>
-            <div className="metric-value">{metrics.total_water_lph} <span>L/hr</span></div>
-            <p className="metric-detail">{metrics.total_buildings} buildings monitored</p>
-          </div>
-        </div>
       </div>
 
       {/* Recommendations */}
       <div className="recommendations-section">
         <h2>🎯 Top Recommendations</h2>
         <div className="recommendation-list">
-          {analysis.campus_recommendations.map((rec, idx) => (
-            <div key={idx} className="recommendation-item">
-              <div className="rec-number">{idx + 1}</div>
-              <p>{rec}</p>
-            </div>
-          ))}
+          {analysis.campus_recommendations
+            .filter(rec => {
+              // Filter out low-quality recommendations
+              const text = rec.toLowerCase();
+              return !text.includes("no immediate actions") &&
+                     !text.includes("operating efficiently") &&
+                     rec.trim().length > 10;
+            })
+            .slice(0, 5)
+            .map((rec, idx) => (
+              <div key={idx} className="recommendation-item">
+                <div className="rec-number">{idx + 1}</div>
+                <p>{rec}</p>
+              </div>
+            ))}
         </div>
       </div>
 

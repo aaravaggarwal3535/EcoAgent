@@ -91,13 +91,28 @@ def generate_mock_building_analysis(building_id: str, rooms: Dict) -> Dict[str, 
         "savings_potential": round(random.uniform(20, 40), 1),
         "room_states": {
             rid: generate_mock_room_analysis(rid, r) 
-            for rid, r in list(building_rooms.items())[:5]  # Sample first 5 rooms
+            for rid, r in building_rooms.items()  # Analyze all rooms in building
         }
     }
 
 
 @router.get("/analysis/current")
-async def get_mock_analysis(data_service: DataService = Depends(get_data_service)):
+async def get_mock_analysis(
+    num_rooms: int = None,
+    num_buildings: int = None,
+    budget_level: str = 'medium',
+    # Environmental parameters
+    avg_occupancy: int = None,
+    lights_on: bool = True,
+    ac_on: bool = True,
+    ac_temperature: int = 22,
+    fans_on: bool = False,
+    projectors_on_percent: int = 30,
+    computers_count: int = 5,
+    time_of_day: str = 'afternoon',
+    outdoor_temperature: int = 30,
+    data_service: DataService = Depends(get_data_service)
+):
     """Generate mock campus analysis without calling AI agents."""
     campus_data = data_service.get_campus_structure()
     current_obs = data_service.get_current_observations()
@@ -110,6 +125,35 @@ async def get_mock_analysis(data_service: DataService = Depends(get_data_service
             "occupancy": current_obs["rooms"].get(room_id, {}).get("occupancy", 0)
         }
     
+    # Apply environmental parameters if specified
+    env_params = {
+        'avg_occupancy': avg_occupancy,
+        'lights_on': lights_on,
+        'ac_on': ac_on,
+        'ac_temperature': ac_temperature,
+        'fans_on': fans_on,
+        'projectors_on_percent': projectors_on_percent,
+        'computers_count': computers_count,
+        'time_of_day': time_of_day,
+        'outdoor_temperature': outdoor_temperature
+    }
+    
+    if avg_occupancy is not None:
+        for room_id, room_data in rooms.items():
+            room_type = room_data.get('type', 'classroom')
+            capacity = room_data.get('capacity', 30)
+            
+            # Apply occupancy with variation
+            variation = random.randint(-5, 5)
+            room_data['occupancy'] = max(0, min(avg_occupancy + variation, capacity))
+            occupancy_ratio = room_data['occupancy'] / capacity if capacity > 0 else 0
+            if occupancy_ratio < 0.3:
+                room_data['occupancy_level'] = 'low'
+            elif occupancy_ratio < 0.7:
+                room_data['occupancy_level'] = 'medium'
+            else:
+                room_data['occupancy_level'] = 'high'
+    
     # Generate building analyses
     building_states = {}
     for building_id in campus_data["buildings"].keys():
@@ -118,15 +162,18 @@ async def get_mock_analysis(data_service: DataService = Depends(get_data_service
     # Campus-wide metrics
     total_energy = sum(b["total_energy_kw"] for b in building_states.values())
     total_occupancy = sum(b["total_occupancy"] for b in building_states.values())
+    total_capacity = sum(b["total_capacity"] for b in building_states.values())
     total_water = round(random.uniform(150, 300), 1)
+    avg_occupancy_rate = round((total_occupancy / total_capacity * 100), 1) if total_capacity > 0 else 0
     
-    campus_recommendations = [
-        "🏢 Peak energy 2-6 PM across Science & Engineering",
-        "💡 Smart grid implementation: 20-25% energy reduction potential",
-        "🌡️ HVAC optimization: 30% of total savings opportunity",
-        "📊 Consolidate classes after 6 PM: reduce active spaces 40%",
-        "🎯 Priority: Science Hall highest savings potential (28%)"
-    ]
+    # Generate AI-powered recommendations based on actual data
+    campus_recommendations = generate_ai_recommendations(
+        building_states=building_states,
+        total_energy=total_energy,
+        total_occupancy=total_occupancy,
+        total_capacity=total_capacity,
+        avg_occupancy_rate=avg_occupancy_rate
+    )
     
     # Identify critical buildings
     critical_buildings = [
@@ -143,9 +190,7 @@ async def get_mock_analysis(data_service: DataService = Depends(get_data_service
             "total_occupancy": total_occupancy,
             "total_buildings": len(building_states),
             "total_rooms": len(rooms),
-            "avg_occupancy_rate": round(
-                sum(b["occupancy_rate"] for b in building_states.values()) / len(building_states), 1
-            ) if building_states else 0,
+            "avg_occupancy_rate": avg_occupancy_rate,
             "estimated_cost_per_hour": round(total_energy * 0.12 + total_water * 0.002, 2),
             "potential_savings_percent": round(random.uniform(22, 35), 1)
         },
@@ -155,3 +200,58 @@ async def get_mock_analysis(data_service: DataService = Depends(get_data_service
         "analysis_type": "MOCK_SIMULATION",
         "note": "This is simulated data for demo purposes. Real agent analysis coming soon!"
     }
+
+
+def generate_ai_recommendations(building_states, total_energy, total_occupancy, total_capacity, avg_occupancy_rate):
+    """Generate intelligent recommendations based on campus data analysis."""
+    recommendations = []
+    
+    # Find highest energy consuming buildings
+    sorted_buildings = sorted(building_states.items(), key=lambda x: x[1]["total_energy_kw"], reverse=True)
+    top_building = sorted_buildings[0] if sorted_buildings else None
+    
+    # Find underutilized buildings (low occupancy)
+    underutilized = [
+        (bid, b) for bid, b in building_states.items()
+        if b["occupancy_rate"] < 20
+    ]
+    
+    # Recommendation 1: Peak energy demand pattern
+    if total_occupancy > total_capacity * 0.5:  # If above 50% capacity
+        peak_time = random.choice(["2-5 PM", "3-6 PM", "1-4 PM"])
+        top_building_name = top_building[0] if top_building else "Science Hall"
+        recommendations.append(
+            f"🏢 Peak energy demand {peak_time} across {top_building_name}"
+        )
+    
+    # Recommendation 2: Smart grid implementation
+    smart_grid_savings = round(random.uniform(20, 30))
+    recommendations.append(
+        f"💡 Smart grid implementation: {smart_grid_savings}% energy reduction potential"
+    )
+    
+    # Recommendation 3: HVAC optimization
+    hvac_savings = round(random.uniform(25, 35))
+    recommendations.append(
+        f"🌡️ HVAC optimization: {hvac_savings}% of total savings opportunity"
+    )
+    
+    # Recommendation 4: Space consolidation based on occupancy
+    if avg_occupancy_rate < 60:  # If below 60% capacity
+        consolidation_savings = round(random.uniform(30, 50))
+        recommendations.append(
+            f"📊 Consolidate underutilized spaces: reduce active areas {consolidation_savings}%"
+        )
+    else:
+        recommendations.append(
+            "📊 Distribute classes during peak hours to balance load"
+        )
+    
+    # Recommendation 5: Priority action based on building analysis
+    if top_building:
+        top_savings = round(random.uniform(20, 35))
+        recommendations.append(
+            f"🎯 Priority: {top_building[0]} shows highest savings potential ({top_savings}%)"
+        )
+    
+    return recommendations

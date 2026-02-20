@@ -51,6 +51,8 @@ class DataService:
         time_of_day = params.get('time_of_day', 'afternoon')
         outdoor_temp = params.get('outdoor_temperature', 30)
         
+        print(f"[DATA_SERVICE] apply_environmental_params called with avg_occupancy={avg_occupancy}")
+        
         for room_id, room_data in rooms.items():
             room_type = room_data.get('type', 'classroom')
             capacity = room_data.get('capacity', 30)
@@ -58,7 +60,9 @@ class DataService:
             # Apply occupancy if specified
             if avg_occupancy is not None:
                 variation = random.randint(-5, 5)
+                old_occupancy = room_data.get('occupancy', 0)
                 room_data['occupancy'] = max(0, min(avg_occupancy + variation, capacity))
+                print(f"[DATA_SERVICE] Room {room_id}: {old_occupancy} → {room_data['occupancy']} (variation={variation})")
                 occupancy_ratio = room_data['occupancy'] / capacity if capacity > 0 else 0
                 if occupancy_ratio < 0.3:
                     room_data['occupancy_level'] = 'low'
