@@ -51,7 +51,7 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section 11*/}
       <section className="landing-hero">
         <div className="bg-gradient-1"></div>
         <div className="bg-gradient-2"></div>
